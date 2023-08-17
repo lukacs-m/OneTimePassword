@@ -1,4 +1,4 @@
-// swift-tools-version:5.1
+// swift-tools-version:5.7
 import PackageDescription
 
 let package = Package(
@@ -14,12 +14,15 @@ let package = Package(
             targets: ["OneTimePassword"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/mattrubin/Base32.git", .upToNextMajor(from: "1.2.0")),
+//        .package(url: "https://github.com/mattrubin/Bases.git",
+//                 revision: "6b9531b044cbf0262265b3c6b4581bf97b4372b6"),
     ],
     targets: [
         .target(
             name: "OneTimePassword",
-            dependencies: ["Base32"],
+            dependencies: [
+//               .product(name: "Base32", package: "Bases"),
+            ],
             path: "Sources"),
         .testTarget(
             name: "OneTimePasswordTests",

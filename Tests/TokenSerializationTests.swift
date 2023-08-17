@@ -23,7 +23,7 @@
 //  SOFTWARE.
 //
 
-import Base32
+//import Base32
 import OneTimePassword
 import XCTest
 
@@ -80,8 +80,7 @@ class TokenSerializationTests: XCTestCase {
                                 let algorithmValue = string(for: algorithm)
                                 queryItems.append(URLQueryItem(name: "algorithm", value: algorithmValue))
                                 queryItems.append(URLQueryItem(name: "digits", value: String(digitNumber)))
-                                let secretValue = MF_Base32Codec.base32String(from: secret)
-                                    .replacingOccurrences(of: "=", with: "")
+                                let secretValue = PTNBase32Codec.base32String(from: secret)?.replacingOccurrences(of: "=", with: "")
                                 queryItems.append(URLQueryItem(name: "secret", value: secretValue))
                                 switch factor {
                                 case .timer(let period):
@@ -390,7 +389,7 @@ class TokenSerializationTests: XCTestCase {
     // MARK: Serialization
 
     func testTOTPURL() throws {
-        let secret = MF_Base32Codec.data(fromBase32String: "AAAQEAYEAUDAOCAJBIFQYDIOB4")!
+        let secret =  PTNBase32Codec.data(from: "AAAQEAYEAUDAOCAJBIFQYDIOB4")!
         let generator = try Generator(factor: .timer(period: 45), secret: secret, algorithm: .sha256, digits: 8)
         let token = Token(name: "Léon", generator: generator)
 
@@ -412,7 +411,7 @@ class TokenSerializationTests: XCTestCase {
     }
 
     func testHOTPURL() throws {
-        let secret = MF_Base32Codec.data(fromBase32String: "AAAQEAYEAUDAOCAJBIFQYDIOB4")!
+        let secret = PTNBase32Codec.data(from: "AAAQEAYEAUDAOCAJBIFQYDIOB4")!
         let generator = try Generator(
             factor: .counter(18446744073709551615),
             secret: secret,
