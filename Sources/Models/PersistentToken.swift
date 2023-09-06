@@ -1,8 +1,8 @@
 //
-//  AppDelegate.swift
+//  PersistentToken.swift
 //  OneTimePassword
 //
-//  Copyright (c) 2016 Matt Rubin and the OneTimePassword authors
+//  Copyright (c) 2014-2018 Matt Rubin and the OneTimePassword authors
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -23,8 +23,21 @@
 //  SOFTWARE.
 //
 
-import UIKit
+import Foundation
 
-@UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
+/// A `PersistentToken` represents a `Token` stored in the `Keychain`. The keychain assigns each
+/// saved `token` a unique `identifier` which can be used to recover the token from the keychain at
+/// a later time.
+public struct PersistentToken: Equatable, Hashable {
+    /// A `Token` stored in the keychain.
+    public let token: Token
+    /// The keychain's persistent identifier for the saved token.
+    public let identifier: Data
+
+    /// Hashes the persistent token's identifier into the given hasher, providing `Hashable` conformance.
+    public func hash(into hasher: inout Hasher) {
+        // Since we expect every `PersistentToken`s identifier to be unique, the identifier's hash
+        // value makes a simple and adequate hash value for the struct as a whole.
+        hasher.combine(identifier)
+    }
 }

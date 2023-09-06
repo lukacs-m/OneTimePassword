@@ -42,9 +42,9 @@ class TokenTests: XCTestCase {
         )
 
         let token = Token(
+            generator: generator,
             name: name,
-            issuer: issuer,
-            generator: generator
+            issuer: issuer
         )
 
         XCTAssertEqual(token.name, name)
@@ -62,9 +62,9 @@ class TokenTests: XCTestCase {
         )
 
         let otherToken = Token(
+            generator: otherGenerator,
             name: otherName,
-            issuer: otherIssuer,
-            generator: otherGenerator
+            issuer: otherIssuer
         )
 
         XCTAssertEqual(otherToken.name, otherName)
@@ -87,11 +87,11 @@ class TokenTests: XCTestCase {
         let name = "Test Name"
         let issuer = "Test Issuer"
 
-        let tokenWithDefaultName = Token(issuer: issuer, generator: generator)
+        let tokenWithDefaultName = Token(generator: generator, issuer: issuer)
         XCTAssertEqual(tokenWithDefaultName.name, "")
         XCTAssertEqual(tokenWithDefaultName.issuer, issuer)
 
-        let tokenWithDefaultIssuer = Token(name: name, generator: generator)
+        let tokenWithDefaultIssuer = Token(generator: generator, name: name)
         XCTAssertEqual(tokenWithDefaultIssuer.name, name)
         XCTAssertEqual(tokenWithDefaultIssuer.issuer, "")
 

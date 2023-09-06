@@ -80,7 +80,7 @@ class TokenSerializationTests: XCTestCase {
                                 let algorithmValue = string(for: algorithm)
                                 queryItems.append(URLQueryItem(name: "algorithm", value: algorithmValue))
                                 queryItems.append(URLQueryItem(name: "digits", value: String(digitNumber)))
-                                let secretValue = PTNBase32Codec.base32String(from: secret)?.replacingOccurrences(of: "=", with: "")
+                                let secretValue = Base32Codec.base32String(from: secret)?.replacingOccurrences(of: "=", with: "")
                                 queryItems.append(URLQueryItem(name: "secret", value: secretValue))
                                 switch factor {
                                 case .timer(let period):
@@ -199,9 +199,9 @@ class TokenSerializationTests: XCTestCase {
                                     digits: digitNumber
                                 )
                                 let token = Token(
+                                    generator: generator,
                                     name: name,
-                                    issuer: issuer,
-                                    generator: generator
+                                    issuer: issuer
                                 )
 
                                 // Serialize
@@ -389,9 +389,9 @@ class TokenSerializationTests: XCTestCase {
     // MARK: Serialization
 
     func testTOTPURL() throws {
-        let secret =  PTNBase32Codec.data(from: "AAAQEAYEAUDAOCAJBIFQYDIOB4")!
+        let secret =  Base32Codec.data(from: "AAAQEAYEAUDAOCAJBIFQYDIOB4")!
         let generator = try Generator(factor: .timer(period: 45), secret: secret, algorithm: .sha256, digits: 8)
-        let token = Token(name: "Léon", generator: generator)
+        let token = Token(generator: generator, name: "Léon")
 
         // swiftlint:disable:next force_try
         let url = try! token.toURL()
@@ -411,13 +411,13 @@ class TokenSerializationTests: XCTestCase {
     }
 
     func testHOTPURL() throws {
-        let secret = PTNBase32Codec.data(from: "AAAQEAYEAUDAOCAJBIFQYDIOB4")!
+        let secret = Base32Codec.data(from: "AAAQEAYEAUDAOCAJBIFQYDIOB4")!
         let generator = try Generator(
             factor: .counter(18446744073709551615),
             secret: secret,
             algorithm: .sha256,
             digits: 8)
-        let token = Token(name: "Léon", generator: generator)
+        let token = Token(generator: generator, name: "Léon")
 
         // swiftlint:disable:next force_try
         let url = try! token.toURL()

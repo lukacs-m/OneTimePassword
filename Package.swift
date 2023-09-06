@@ -14,20 +14,19 @@ let package = Package(
             targets: ["OneTimePassword"]),
     ],
     dependencies: [
-//        .package(url: "https://github.com/mattrubin/Bases.git",
-//                 revision: "6b9531b044cbf0262265b3c6b4581bf97b4372b6"),
     ],
     targets: [
         .target(
             name: "OneTimePassword",
-            dependencies: [
-//               .product(name: "Base32", package: "Bases"),
-            ],
-            path: "Sources"),
+            dependencies: [],
+            path: "Sources",
+            swiftSettings: [
+                SwiftSetting.unsafeFlags(["-Xfrontend", "-strict-concurrency=complete"])
+            ]),
         .testTarget(
             name: "OneTimePasswordTests",
             dependencies: ["OneTimePassword"],
             path: "Tests",
-            exclude: ["App", "KeychainTests.swift"]),
+            exclude: ["KeychainTests.swift"]),
     ]
 )

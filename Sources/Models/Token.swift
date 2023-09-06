@@ -44,7 +44,7 @@ public struct Token: Equatable {
     /// - parameter generator:  The password generator.
     ///
     /// - returns: A new token with the given parameters.
-    public init(name: String = "", issuer: String = "", generator: Generator) {
+    public init(generator: Generator, name: String = "", issuer: String = "") {
         self.name = name
         self.issuer = issuer
         self.generator = generator
@@ -66,6 +66,6 @@ public struct Token: Equatable {
 
     /// - returns: A new `Token`, configured to generate the next password.
     public func updatedToken() -> Token {
-        return Token(name: name, issuer: issuer, generator: generator.successor())
+        Token(generator: generator.successor(), name: name, issuer: issuer)
     }
 }

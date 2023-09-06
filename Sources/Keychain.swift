@@ -40,19 +40,18 @@ public final class Keychain {
     /// - throws: A `Keychain.Error` if an error occurred.
     /// - returns: The persistent token, or `nil` if no token matched the given identifier.
     public func persistentToken(withIdentifier identifier: Data) throws -> PersistentToken? {
-        return try keychainItem(forPersistentRef: identifier).map(PersistentToken.init(keychainDictionary:))
+        try keychainItem(forPersistentRef: identifier).map(PersistentToken.init(keychainDictionary:))
     }
 
     /// Returns the set of all persistent tokens found in the keychain.
     ///
     /// - throws: A `Keychain.Error` if an error occurred.
     public func allPersistentTokens() throws -> Set<PersistentToken> {
-        let allItems = try allKeychainItems()
         // This code intentionally ignores items which fail deserialization, instead opting to return as many readable
         // tokens as possible.
-        // TODO: Restore deserialization error handling, in a way that provides info on the failure reason and allows
-        //       the caller to choose whether to fail completely or recover some data.
-        return Set(allItems.compactMap({ try? PersistentToken(keychainDictionary: $0) }))
+        let allItems = try allKeychainItems().map { try PersistentToken(keychainDictionary: $0) }
+  
+        return Set(allItems)
     }
 
     // MARK: Write
@@ -110,19 +109,16 @@ public final class Keychain {
 
 // MARK: - Private
 
-private let kOTPService = "me.mattrubin.onetimepassword.token"
-private let urlStringEncoding = String.Encoding.utf8
-
 private extension Token {
     func keychainAttributes() throws -> [String: AnyObject] {
         let url = try self.toURL()
-        guard let data = url.absoluteString.data(using: urlStringEncoding) else {
+        guard let data = url.absoluteString.data(using: Configuration.urlStringEncoding) else {
             throw Keychain.Error.tokenSerializationFailure
         }
         return [
-            kSecAttrGeneric as String:  data as NSData,
-            kSecValueData as String:    generator.secret as NSData,
-            kSecAttrService as String:  kOTPService as NSString,
+            kSecAttrGeneric as String: data as NSData,
+            kSecValueData as String: generator.secret as NSData,
+            kSecAttrService as String: Configuration.kOTPService as NSString
         ]
     }
 }
@@ -145,7 +141,7 @@ private extension PersistentToken {
         guard let keychainItemRef = keychainDictionary[kSecValuePersistentRef as String] as? Data else {
             throw DeserializationError.missingPersistentRef
         }
-        guard let urlString = String(data: urlData, encoding: urlStringEncoding),
+        guard let urlString = String(data: urlData, encoding: Configuration.urlStringEncoding),
             let url = URL(string: urlString) else {
                 throw DeserializationError.unreadableData
         }
@@ -181,8 +177,8 @@ private func addKeychainItem(withAttributes attributes: [String: AnyObject]) thr
 private func updateKeychainItem(forPersistentRef persistentRef: Data,
                                 withAttributes attributesToUpdate: [String: AnyObject]) throws {
     let queryDict: [String: AnyObject] = [
-        kSecClass as String:               kSecClassGenericPassword,
-        kSecValuePersistentRef as String:  persistentRef as NSData,
+        kSecClass as String: kSecClassGenericPassword,
+        kSecValuePersistentRef as String: persistentRef as NSData
     ]
 
     let resultCode = SecItemUpdate(queryDict as CFDictionary, attributesToUpdate as CFDictionary)
@@ -194,8 +190,8 @@ private func updateKeychainItem(forPersistentRef persistentRef: Data,
 
 private func deleteKeychainItem(forPersistentRef persistentRef: Data) throws {
     let queryDict: [String: AnyObject] = [
-        kSecClass as String:               kSecClassGenericPassword,
-        kSecValuePersistentRef as String:  persistentRef as NSData,
+        kSecClass as String: kSecClassGenericPassword,
+        kSecValuePersistentRef as String: persistentRef as NSData
     ]
 
     let resultCode = SecItemDelete(queryDict as CFDictionary)
@@ -207,11 +203,11 @@ private func deleteKeychainItem(forPersistentRef persistentRef: Data) throws {
 
 private func keychainItem(forPersistentRef persistentRef: Data) throws -> NSDictionary? {
     let queryDict: [String: AnyObject] = [
-        kSecClass as String:                kSecClassGenericPassword,
-        kSecValuePersistentRef as String:   persistentRef as NSData,
-        kSecReturnPersistentRef as String:  kCFBooleanTrue,
-        kSecReturnAttributes as String:     kCFBooleanTrue,
-        kSecReturnData as String:           kCFBooleanTrue,
+        kSecClass as String: kSecClassGenericPassword,
+        kSecValuePersistentRef as String: persistentRef as NSData,
+        kSecReturnPersistentRef as String: kCFBooleanTrue,
+        kSecReturnAttributes as String: kCFBooleanTrue,
+        kSecReturnData as String: kCFBooleanTrue
     ]
 
     var result: AnyObject?
@@ -234,11 +230,11 @@ private func keychainItem(forPersistentRef persistentRef: Data) throws -> NSDict
 
 private func allKeychainItems() throws -> [NSDictionary] {
     let queryDict: [String: AnyObject] = [
-        kSecClass as String:                kSecClassGenericPassword,
-        kSecMatchLimit as String:           kSecMatchLimitAll,
-        kSecReturnPersistentRef as String:  kCFBooleanTrue,
-        kSecReturnAttributes as String:     kCFBooleanTrue,
-        kSecReturnData as String:           kCFBooleanTrue,
+        kSecClass as String: kSecClassGenericPassword,
+        kSecMatchLimit as String: kSecMatchLimitAll,
+        kSecReturnPersistentRef as String: kCFBooleanTrue,
+        kSecReturnAttributes as String: kCFBooleanTrue,
+        kSecReturnData as String: kCFBooleanTrue
     ]
 
     var result: AnyObject?
