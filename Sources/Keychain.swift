@@ -27,7 +27,7 @@ import Foundation
 
 /// The `Keychain`'s shared instance is a singleton which represents the iOS system keychain used
 /// to securely store tokens.
-public final class Keychain {
+public final class Keychain: Sendable {
     /// The singleton `Keychain` instance.
     public static let sharedInstance = Keychain()
 

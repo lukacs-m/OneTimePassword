@@ -68,10 +68,10 @@ class EquatableTests: XCTestCase {
     func testTokenEquality() throws {
         let generator = try Generator(factor: .counter(0), secret: Data(), algorithm: .sha1, digits: 6)
         let otherGenerator = try Generator(factor: .counter(1), secret: Data(), algorithm: .sha512, digits: 8)
+let id = "test"
+        let token = Token(id: id, generator: generator,name: "Name", issuer: "Issuer")
 
-        let token = Token(generator: generator,name: "Name", issuer: "Issuer")
-
-        XCTAssertEqual(token, Token(generator: generator, name: "Name", issuer: "Issuer"))
+        XCTAssertEqual(token, Token(id: id, generator: generator, name: "Name", issuer: "Issuer"))
         XCTAssertNotEqual(token, Token(generator: generator, name: "", issuer: "Issuer"))
         XCTAssertNotEqual(token, Token(generator: generator, name: "Name", issuer: ""))
         XCTAssertNotEqual(token, Token(generator: otherGenerator, name: "Name", issuer: "Issuer"))
