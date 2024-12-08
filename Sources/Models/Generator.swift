@@ -164,7 +164,7 @@ public struct Generator: Equatable, Sendable {
         ///
         /// - throws: A `Generator.Error` if a valid counter cannot be calculated.
         /// - returns: The counter value needed to generate the password for the target time.
-        fileprivate func counterValue(at time: Date) throws -> UInt64 {
+        public func counterValue(at time: Date) throws -> UInt64 {
             switch self {
             case .counter(let counter):
                 return counter
@@ -173,6 +173,15 @@ public struct Generator: Equatable, Sendable {
                 try Generator.validateTime(timeSinceEpoch)
                 try Generator.validatePeriod(period)
                 return UInt64(timeSinceEpoch / period)
+            }
+        }
+
+        public var period: TimeInterval? {
+            switch self {
+            case let .timer(period:  period):
+                return period
+            case .counter:
+                return nil
             }
         }
     }
