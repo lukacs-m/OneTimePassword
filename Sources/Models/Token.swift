@@ -26,7 +26,7 @@
 import Foundation
 
 /// A `Token` contains a password generator and information identifying the corresponding account.
-public struct Token: Equatable, Identifiable, Sendable {
+public struct Token: Equatable, Identifiable, Sendable, Codable, Hashable {
     public let id: String
 
     /// A string indicating the account represented by the token.

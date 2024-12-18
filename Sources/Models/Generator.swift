@@ -27,7 +27,7 @@ import CryptoKit
 import Foundation
 
 /// A `Generator` contains all of the parameters needed to generate a one-time password.
-public struct Generator: Equatable, Sendable {
+public struct Generator: Equatable, Sendable, Codable, Hashable {
     /// The moving factor, either timer- or counter-based.
     public let factor: Factor
 
@@ -144,7 +144,7 @@ public struct Generator: Equatable, Sendable {
 
     /// A moving factor with which a generator produces different one-time passwords over time.
     /// The possible values are `Counter` and `Timer`, with associated values for each.
-    public enum Factor: Equatable, Sendable {
+    public enum Factor: Equatable, Sendable, Codable, Hashable {
         /// Indicates a HOTP, with an associated 8-byte counter value for the moving factor. After
         /// each use of the password generator, the counter should be incremented to stay in sync
         /// with the server.
@@ -188,7 +188,7 @@ public struct Generator: Equatable, Sendable {
 
     /// A cryptographic hash function used to calculate the HMAC from which a password is derived.
     /// The supported algorithms are SHA-1, SHA-256, and SHA-512.
-    public enum Algorithm: Equatable, Sendable {
+    public enum Algorithm: Equatable, Sendable, Codable, Hashable {
         /// The SHA-1 hash function.
         case sha1
         /// The SHA-256 hash function.
